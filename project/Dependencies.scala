@@ -87,6 +87,8 @@ object Dependencies {
     "org.springframework" % "spring-beans" % springVersion,
     "org.springframework" % "spring-context-support" % springVersion,
 
+    //Twitterstreamingclient  
+    "com.danielasfregola" %% "twitter4s" % "5.3",
     // support for HOCON beans configuration
     "com.avsystem.commons" %% "commons-spring" % avsystemCommonsVersion,
 
