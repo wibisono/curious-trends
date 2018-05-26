@@ -5,6 +5,7 @@ import org.wongiseng.backend.services.DomainServices
 import org.wongiseng.shared.model.SharedExceptions
 import org.wongiseng.shared.rpc.server.MainServerRPC
 import io.udash.rpc._
+import io.udash.rpc.utils.DefaultAtmosphereFramework
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.session.SessionHandler
 import org.eclipse.jetty.servlet.{DefaultServlet, ServletContextHandler, ServletHolder}

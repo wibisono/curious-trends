@@ -5,15 +5,16 @@ import com.danielasfregola.twitter4s.entities.{Tweet, User}
 import org.joda.time.DateTime
 import java.util.Date
 import scala.collection.mutable
+import com.avsystem.commons._
 
-class AnalyserService(hashtags : Seq[String]) extends UserStats {
+class UserStatService(hashtags : JList[String]) extends UserStats {
 
   var tweetCount = 0
   val idUsers = mutable.HashMap[Long, User]()
   val userCount = mutable.HashMap[Long, Int]()
 
   val streamingClient = TwitterStreamingClient()
-  streamingClient.filterStatuses(tracks = hashtags) {
+  streamingClient.filterStatuses(tracks = hashtags.asScala) {
     case tweet: Tweet => {
       tweetCount += 1
       println(s"@${tweet.user.map(_.screen_name).orNull} : ${tweet.text}")
@@ -33,7 +34,6 @@ class AnalyserService(hashtags : Seq[String]) extends UserStats {
       }
     }
   }
-
 }
 
 trait  UserStats {

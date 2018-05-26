@@ -1,3 +1,12 @@
+#Actual Readme
+
+Attempt to turn this Gist for twitter hash tags user statistics:
+
+https://gist.github.com/wibisono/25a5e43d380c08afd35813672a5641b2
+
+Into full application, using Udash. Following are standard Readme from Udash gitter8
+
+
 # Backend (JVM)
 
 The code from this module is responsible for handling clients' RPC requests, serving static files 
@@ -53,8 +62,3 @@ to refresh them, just run `sbt compileCss` (or `compileStatics` which depends on
 and refresh the page in the browser. 
 
 Read more about Udash CSS in the [Udash Guide](http://guide.udash.io/#/frontend/templates).
-
-## What's next?
-
-You are now familiar with the `backend` module. It's time to take a look at the client application in the 
-`frontend` module.
