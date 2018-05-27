@@ -14,9 +14,14 @@ Built using:
 
 # Starting App
 
-First configure twitter API keys rename [twitter.conf.example](https://github.com/wibisono/curious-trends/blob/master/backend/src/main/resources/twitter.conf.example) into twitter.conf and set your keys there, then:
+First configure twitter settings:
+* Rename [twitter.conf.example](https://github.com/wibisono/curious-trends/blob/master/backend/src/main/resources/twitter.conf.example) into twitter.conf
+* Setup your twitter API keys in that file, and unfortunately hardcoded hashtag you wanted to track for now.
+
+Then you can run:
 
     sbt run
+    
     
 http://localhost:9000/#/trends to see current state of curious trend.
 
