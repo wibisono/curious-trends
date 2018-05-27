@@ -20,5 +20,9 @@ First configure twitter API keys rename [twitter.conf.example](https://github.co
     
 http://localhost:9000/#/trends to see current state of curious trend.
 
-http://localhost:9000/#/chat to see default chat application from Udash g8 template.
 
+This is an example of normal generic trending topics user characteristics looks like (ramos after dirty wins of Real madrid):
+![image](https://i.imgur.com/aq1KBgm.png)
+
+Unfortunately I don't yeat have a sample of curious trending topic using the new UI, but here was a sample output of the original gist, tracking a curiously promoted hashtag #HTILanjutkan (Indonesian politics):
+![image](https://i.imgur.com/L4INuTr.gif)

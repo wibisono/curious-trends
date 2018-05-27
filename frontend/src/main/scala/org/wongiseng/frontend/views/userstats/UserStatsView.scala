@@ -3,7 +3,8 @@ package org.wongiseng.frontend.views.userstats
 import io.udash._
 import io.udash.bootstrap.BootstrapStyles
 import io.udash.bootstrap.panel.{PanelStyle, UdashPanel}
-import io.udash.bootstrap.utils.{UdashListGroup, UdashPageHeader}
+import io.udash.bootstrap.table.UdashTable
+import io.udash.bootstrap.utils.UdashPageHeader
 import io.udash.css.CssView
 import io.udash.wrappers.highcharts.HighchartsUtils._
 import io.udash.wrappers.jquery.jQ
@@ -33,6 +34,19 @@ class UserStatsView(model: ModelProperty[UserStatsModel], presenter: UserStatsPr
     val categories = model.subProp(_.userStats).transformToSeq(_.stats)
     val activities = model.subProp(_.userStats).transformToSeq(_.activity)
 
+    val striped = Property(true)
+    val bordered = Property(true)
+    val hover = Property(true)
+    val condensed = Property(false)
+
+    val activityTable = UdashTable(striped, bordered, hover, condensed)(activities)(
+      headerFactory = Some(() => tr(th(b("Username")), th(b("Tweet count"))).render),
+      rowFactory = (el) => tr(
+        td(produce(el)(v => a(href:=s"https://twitter.com/${v.name}")(v.name).render)),
+        td(produce(el)(v => i(v.count).render)),
+      ).render
+    )
+
     div(cls := "bootstrap",
         UdashPageHeader(
           h1("Tracked keywords #", bind(hashTag), small("      | Total tweets:", bind(totalTweets)))).render,
@@ -41,9 +55,7 @@ class UserStatsView(model: ModelProperty[UserStatsModel], presenter: UserStatsPr
           div(BootstrapStyles.Grid.colXs12, BootstrapStyles.Well.well)(
             UdashPanel(PanelStyle.Success)(
               UdashPanel.heading(s"User activity"),
-              UdashListGroup(activities) { act =>
-                li(span(a(s"http://twitter/${act.get.name}   "), act.get.count)).render
-                                         }.render
+              activityTable.render
             ).render
           )
         ),
