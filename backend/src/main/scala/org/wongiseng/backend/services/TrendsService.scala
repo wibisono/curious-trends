@@ -80,10 +80,10 @@ trait UserCategories {
     val age4y = DateTime.now().minusYears(4).toDate
 
     val cntAge3m     = CategoryCount("<= 3m",users.count(created_limit(after=age3m)))
-    val cntAge3to6m  = CategoryCount("3 months util 6 months",users.count(created_limit(age3m, age6m)))
-    val cntAge6mto1y = CategoryCount("6 months util 12 months",users.count(created_limit(age6m, age1y)))
-    val cntAge1yto2y = CategoryCount("12 months util 24 months",users.count(created_limit(age1y, age2y)))
-    val cntAge2yto4y = CategoryCount("24 months util 36 months",users.count(created_limit(age2y, age4y)))
+    val cntAge3to6m  = CategoryCount("3 months util 6 months",users.count(created_limit(age6m, age3m)))
+    val cntAge6mto1y = CategoryCount("6 months util 12 months",users.count(created_limit(age1y, age6m)))
+    val cntAge1yto2y = CategoryCount("12 months util 24 months",users.count(created_limit(age2y, age1y)))
+    val cntAge2yto4y = CategoryCount("24 months util 36 months",users.count(created_limit(age4y, age2y)))
     val cntOlder4y   = CategoryCount("> 48 months ",users.count(created_limit(before=age4y)))
 
     CategoryStats("Account age", List(cntAge3m, cntAge3to6m, cntAge6mto1y, cntAge1yto2y, cntAge2yto4y, cntOlder4y))
