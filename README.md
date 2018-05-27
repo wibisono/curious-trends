@@ -29,5 +29,6 @@ http://localhost:9000/#/trends to see current state of curious trend.
 This is an example of normal generic trending topics user characteristics looks like (ramos after dirty wins of Real madrid):
 ![image](https://i.imgur.com/aq1KBgm.png)
 
-Unfortunately I don't yeat have a sample of curious trending topic using the new UI, but here was a sample output of the original gist, tracking a curiously promoted hashtag #HTILanjutkan (Indonesian politics):
+Unfortunately I have not yet found another curious trends to be analysed using this newly build, work in progress, udash based analyser, what I currently have is just previous result of original gist that shows skewed user attributes that promote a certain tag, related to Indonesian politics (#HTILanjutkanPerjuangan):
+
 ![image](https://i.imgur.com/L4INuTr.gif)
