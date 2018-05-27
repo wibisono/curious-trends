@@ -10,6 +10,7 @@ import org.wongiseng.shared.model.chat.ChatMessage
 import org.wongiseng.shared.rpc.server.secure.chat.ChatRPC
 import io.udash._
 import io.udash.auth.AuthRequires
+import io.udash.properties.model.ModelProperty
 
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}

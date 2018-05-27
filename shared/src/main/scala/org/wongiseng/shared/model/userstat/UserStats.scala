@@ -8,7 +8,9 @@ object CategoryCount extends HasGenCodec[CategoryCount]
 case class CategoryStats(category: String, counts: List[CategoryCount])
 object CategoryStats extends HasGenCodec[CategoryStats]
 
-case class UserActivity(name : String, count : Int)
+case class UserActivity(name : String, count : Int){
+  override def toString: String = s"$name has tweeted $count times"
+}
 object UserActivity extends HasGenCodec[UserActivity]
 
 case class UserStats(hashTag : String, totalTweets: Int, stats: List[CategoryStats], activity: List[UserActivity])

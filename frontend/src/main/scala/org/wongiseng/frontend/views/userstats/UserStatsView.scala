@@ -1,15 +1,16 @@
 package org.wongiseng.frontend.views.userstats
 
-import io.udash._
 import io.udash.bootstrap.BootstrapStyles
+import io.udash.bootstrap.button.{ButtonSize, ButtonStyle, UdashButton}
 import io.udash.bootstrap.panel.{PanelStyle, UdashPanel}
-import io.udash.bootstrap.utils.UdashListGroup
+import io.udash.bootstrap.utils.{UdashBadge, UdashListGroup}
 import io.udash.css.CssView
 import io.udash.wrappers.highcharts.HighchartsUtils._
 import io.udash.wrappers.jquery.jQ
+import io.udash.{ModelProperty, _}
 import org.scalajs.dom.Element
 import org.wongiseng.frontend.views.userstats.charts.CategoryPieChart
-import org.wongiseng.shared.model.userstat.{CategoryStats, UserStats}
+import org.wongiseng.shared.model.userstat.CategoryStats
 import scalatags.JsDom.all._
 
 class UserStatsView(model: ModelProperty[UserStatsModel], presenter: UserStatsPresenter)
@@ -19,7 +20,8 @@ class UserStatsView(model: ModelProperty[UserStatsModel], presenter: UserStatsPr
     div().render
 
   override def getTemplate: Modifier = {
-    val userStat: UserStats = model.subProp(_.userStats).get
+
+
 
     def categoryChart(stat: CategoryStats) = {
       val c = chartContainer()
@@ -33,17 +35,28 @@ class UserStatsView(model: ModelProperty[UserStatsModel], presenter: UserStatsPr
       ).render
     }
 
+    val categories = model.subProp(_.userStats).transformToSeq(_.stats)
+    val activities = model.subProp(_.userStats).transformToSeq(_.activity)
+    val hashTag = model.subProp(_.userStats).transform(_.hashTag)
+    val totalTweets = model.subProp(_.userStats).transform(_.totalTweets)
+
     div(cls := "bootstrap",
         div(BootstrapStyles.row)(
           div(BootstrapStyles.Grid.colXs12, BootstrapStyles.Well.well)(
-            h3(s"User statistics for: ${userStat.hashTag} sampled from #${userStat.totalTweets} tweets")
+            UdashButton(buttonStyle = ButtonStyle.Primary, size = ButtonSize.Large)(
+              "#  ", UdashBadge(hashTag).render
+            ).render,
+            UdashPanel(PanelStyle.Success)().render,
+            UdashButton(buttonStyle = ButtonStyle.Primary, size = ButtonSize.Large)(
+              "Total tweets:   ", UdashBadge(totalTweets).render
+            ).render
           ),
-          repeat(model.subProp(_.userStats).transformToSeq(_.stats))(e=>categoryChart(e.get)),
+          repeat(categories)(e=>categoryChart(e.get)),
           div(BootstrapStyles.Grid.colXs12, BootstrapStyles.Well.well)(
             UdashPanel(PanelStyle.Success)(
               UdashPanel.heading(s"User activity"),
-              UdashListGroup(model.subProp(_.userStats).transformToSeq(_.activity)){ act =>
-                li(bind(act)).render
+              UdashListGroup(activities){ act =>
+                li(span(a(s"http://twitter/${act.get.name}   "), act.get.count)).render
               }.render
             ).render
           )

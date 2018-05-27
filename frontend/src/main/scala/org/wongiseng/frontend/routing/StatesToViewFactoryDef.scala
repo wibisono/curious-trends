@@ -19,6 +19,8 @@ class StatesToViewFactoryDef extends ViewFactoryRegistry[RoutingState] {
       case ChatState => new ChatViewFactory(
         ApplicationContext.userService, ApplicationContext.translationsService, ApplicationContext.notificationsCenter
       )
-      case UserStatsState => new UserStatsViewFactory()
+      case UserStatsState => new UserStatsViewFactory(
+        ApplicationContext.notificationsCenter
+      )
     }
 }
