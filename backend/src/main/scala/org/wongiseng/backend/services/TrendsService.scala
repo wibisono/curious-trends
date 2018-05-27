@@ -31,29 +31,31 @@ class TrendsService(hashtags : JList[String], rpcClientsService: RpcClientsServi
           idUsers.put(user.id, user)
         })
 
-        val ages = accountAges(idUsers.values.toSet)
-        val followers = followerCounts(idUsers.values.toSet)
-        val activities = userCount.toList.sortBy(-_._2).take(20).map {
-         case (userId, count) => UserActivity(idUsers(userId).screen_name, count)
-        }
-
-        val userStats = UserStats(
-          hashTags.mkString(" "), tweetCount,
-          List(ages, followers),
-          activities
-        )
-
-        rpcClientsService.sendToClient(AllClients)
-          .trends().newUserStats(userStats)
-
+        if(tweetCount % 10 == 0) updateClients()
       }
     }
 
+  private def updateClients(): Unit = {
+    val ages = accountAges(idUsers.values.toSet)
+    val followers = followerCounts(idUsers.values.toSet)
+    val activities = userCount.toList.sortBy(-_._2).take(20).map
+    {
+     case (userId, count) => UserActivity(idUsers(userId).screen_name, count)
+    }
+
+    val userStats = UserStats(
+      hashTags.mkString(" "), tweetCount,
+      List(ages, followers),
+      activities
+    )
+
+    if(rpcClientsService.activeClients.size > 0)
+    rpcClientsService.sendToClient(AllClients)
+      .trends().newUserStats(userStats)
+  }
 }
 
 trait UserCategories {
-
-
 
   def followers_limit(low : Int = Int.MinValue, high : Int = Int.MaxValue)(u : User) = u.followers_count < high && u.followers_count >= low
   def created_limit(after: Date = DateTime.now().minusYears(100).toDate,
