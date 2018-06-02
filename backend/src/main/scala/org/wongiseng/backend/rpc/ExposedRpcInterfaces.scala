@@ -11,6 +11,8 @@ import org.wongiseng.shared.rpc.server.open.AuthRPC
 import org.wongiseng.shared.rpc.server.secure.SecureRPC
 import io.udash.i18n.RemoteTranslationRPC
 import io.udash.rpc._
+import org.wongiseng.backend.rpc.trends.TrendsEndpoint
+import org.wongiseng.shared.rpc.server.trends.TrendsRPC
 
 class ExposedRpcInterfaces(implicit domainServices: DomainServices, clientId: ClientId) extends MainServerRPC {
   // required domain services are implicitly passed to the endpoints
@@ -42,4 +44,8 @@ class ExposedRpcInterfaces(implicit domainServices: DomainServices, clientId: Cl
   }
 
   override def translations(): RemoteTranslationRPC = TranslationsEndpoint
+
+  /** Getting trends RPC */
+  /** We are implicitly passing domain service containing trends service and also passing implicitly clientId */
+  override def trends(): TrendsRPC = new TrendsEndpoint
 }

@@ -5,6 +5,7 @@ import org.wongiseng.shared.rpc.server.open.AuthRPC
 import org.wongiseng.shared.rpc.server.secure.SecureRPC
 import io.udash.i18n._
 import io.udash.rpc._
+import org.wongiseng.shared.rpc.server.trends.TrendsRPC
 
 @RPC
 trait MainServerRPC {
@@ -16,6 +17,9 @@ trait MainServerRPC {
 
   /** Returns an RPC serving translations from the server resources. */
   def translations(): RemoteTranslationRPC
+
+  /** Getting trends RPC */
+  def trends(): TrendsRPC
 }
 
 object MainServerRPC extends DefaultServerUdashRPCFramework.RPCCompanion[MainServerRPC]
