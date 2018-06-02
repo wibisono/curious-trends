@@ -5,6 +5,7 @@ import java.util.Date
 import com.avsystem.commons._
 import com.danielasfregola.twitter4s.TwitterStreamingClient
 import com.danielasfregola.twitter4s.entities.{Tweet, User}
+import io.udash.logging.CrossLogging
 import io.udash.rpc.ClientId
 import org.joda.time.DateTime
 import org.wongiseng.shared.model.userstat.{CategoryCount, CategoryStats, UserActivity, UserStats}
@@ -12,27 +13,31 @@ import org.wongiseng.shared.model.userstat.{CategoryCount, CategoryStats, UserAc
 import scala.collection.mutable
 
 class TrendsService(rpcClientsService: RpcClientsService)
-    extends UserCategories {
+    extends UserCategories  with CrossLogging {
 
   val streamingClient = TwitterStreamingClient()
 
   def subscribeHashtag(hashtag: String)(implicit clientId: ClientId): Future[Unit] = {
+    logger.info("Subscribing hashtag: "+ hashtag)
     observeHashtag(hashtag, clientId)
     Future.unit
   }
 
   var hashTags = Set[String]()
+  var tweetCount = 0
+  val idUsers = mutable.HashMap[Long, User]()
+  val userCount = mutable.HashMap[Long, Int]()
 
   private def observeHashtag(hashtag: String, clientId: ClientId) = {
     hashTags = hashTags + hashtag
-    var tweetCount = 0
-    val idUsers = mutable.HashMap[Long, User]()
-    val userCount = mutable.HashMap[Long, Int]()
 
+    logger.info("Current hashtag set: "+ hashTags.mkString(", "))
 
-    streamingClient.filterStatuses(tracks = hashTags.toSeq) {
+    val seqHashtag = hashTags.toList
+
+    streamingClient.filterStatuses(tracks = seqHashtag) {
       case tweet: Tweet => {
-
+        logger.info("Tweet "+tweet.text)
         tweetCount += 1
         tweet.user.map(user => {
           val curCount = userCount.getOrElseUpdate(user.id, 0)
@@ -58,6 +63,8 @@ class TrendsService(rpcClientsService: RpcClientsService)
         activities
       )
 
+      logger.info("Active clients size " + rpcClientsService.activeClients.size)
+      logger.info("Current client id " + clientId)
       if (rpcClientsService.activeClients.size > 0)
         rpcClientsService
           .sendToClient(clientId)
