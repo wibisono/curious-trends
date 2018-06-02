@@ -17,29 +17,29 @@ class UserStatsView(model: ModelProperty[UserStatsModel], presenter: UserStatsPr
 
   override def getTemplate: Modifier = {
 
-    def categoryChart(stat: CategoryStats) = {
+    def categoryChart(readableStat: ReadableProperty[CategoryStats]) = {
       val c = div().render
-      jQ(c).highcharts(CategoryPieChart.config(stat))
-
-      div(BootstrapStyles.Grid.colXs6, BootstrapStyles.Well.well)(
-        UdashPanel(PanelStyle.Success)(
-          UdashPanel.heading(stat.category),
-          UdashPanel.body(c)
+      val binding = produce(readableStat) { stat =>
+        jQ(c).highcharts(CategoryPieChart.config(stat))
+        div(BootstrapStyles.Grid.colXs6, BootstrapStyles.Well.well)(
+          UdashPanel(PanelStyle.Success)(
+            UdashPanel.heading(stat.category),
+            UdashPanel.body(c)
+          ).render
         ).render
-      ).render
+      }
+      div(binding).render
     }
 
     val hashTag = model.subProp(_.userStats).transform(_.hashTag)
     val totalTweets = model.subProp(_.userStats).transform(_.totalTweets)
-    val categories = model.subProp(_.userStats).transformToSeq(_.stats)
-    val activities = model.subProp(_.userStats).transformToSeq(_.activity)
 
     val striped = Property(true)
     val bordered = Property(true)
     val hover = Property(true)
     val condensed = Property(false)
 
-    val activityTable = UdashTable(striped, bordered, hover, condensed)(activities)(
+    val activityTable = UdashTable(striped, bordered, hover, condensed)(model.subProp(_.userStats).transformToSeq(_.activity))(
       headerFactory = Some(() => tr(th(b("Username")), th(b("Tweet count"))).render),
       rowFactory = (el) => tr(
         td(produce(el)(v => a(href:=s"https://twitter.com/${v.name}")(v.name).render)),
@@ -51,7 +51,7 @@ class UserStatsView(model: ModelProperty[UserStatsModel], presenter: UserStatsPr
         UdashPageHeader(
           h1("Tracked keywords #", bind(hashTag), small("      | Total tweets:", bind(totalTweets)))).render,
         div(BootstrapStyles.row)(
-          repeat(categories)(e => categoryChart(e.get)),
+          repeat(model.subProp(_.userStats).transformToSeq(_.stats))(categoryChart),
           div(BootstrapStyles.Grid.colXs12, BootstrapStyles.Well.well)(
             UdashPanel(PanelStyle.Success)(
               UdashPanel.heading(s"User activity"),
