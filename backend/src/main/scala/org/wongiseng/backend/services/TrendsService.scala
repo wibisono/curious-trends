@@ -37,7 +37,6 @@ class TrendsService(rpcClientsService: RpcClientsService)
 
     streamingClient.filterStatuses(tracks = seqHashtag) {
       case tweet: Tweet => {
-        logger.info("Tweet "+tweet.text)
         tweetCount += 1
         tweet.user.map(user => {
           val curCount = userCount.getOrElseUpdate(user.id, 0)
@@ -50,6 +49,7 @@ class TrendsService(rpcClientsService: RpcClientsService)
     }
 
     def updateClients(): Unit = {
+      logger.info("Updating client : "+clientId)
       val ages = accountAges(idUsers.values.toSet)
       val followers = followerCounts(idUsers.values.toSet)
       val activities = userCount.toList.sortBy(-_._2).take(20).map {
@@ -63,8 +63,6 @@ class TrendsService(rpcClientsService: RpcClientsService)
         activities
       )
 
-      logger.info("Active clients size " + rpcClientsService.activeClients.size)
-      logger.info("Current client id " + clientId)
       if (rpcClientsService.activeClients.size > 0)
         rpcClientsService
           .sendToClient(clientId)
