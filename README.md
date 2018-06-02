@@ -16,14 +16,14 @@ Built using:
 
 First configure twitter settings:
 * Rename [twitter.conf.example](https://github.com/wibisono/curious-trends/blob/master/backend/src/main/resources/twitter.conf.example) into twitter.conf
-* Setup your twitter API keys in that file, and unfortunately hardcoded hashtag you wanted to track for now.
+* Setup your twitter API keys in that file.
 
 Then you can run:
 
     sbt run
     
     
-http://localhost:9000/#/trends to see current state of curious trend.
+http://localhost:9000/#/trends/[hashtag] to see current state of curious trend.
 
 
 This is an example of normal generic trending topics user characteristics looks like (ramos after dirty wins of Real madrid):
