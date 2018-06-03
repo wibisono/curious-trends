@@ -11,6 +11,10 @@ import io.udash.wrappers.jquery.jQ
 import org.wongiseng.frontend.views.userstats.charts.CategoryPieChart
 import org.wongiseng.shared.model.userstat.CategoryStats
 import scalatags.JsDom.all._
+import org.singlespaced.d3js.d3
+import org.singlespaced.d3js.Ops._
+
+import scala.scalajs.js
 
 class UserStatsView(model: ModelProperty[UserStatsModel], presenter: UserStatsPresenter)
   extends ContainerView with CssView {
@@ -46,6 +50,8 @@ class UserStatsView(model: ModelProperty[UserStatsModel], presenter: UserStatsPr
         td(produce(el)(v => i(v.count).render)),
       ).render
     )
+    val sel=d3.selectAll("div").data(js.Array(5,2,4,6))
+    sel.style("width", (d:Int) => d*2 )
 
     div(cls := "bootstrap",
         UdashPageHeader(

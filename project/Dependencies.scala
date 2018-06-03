@@ -47,6 +47,9 @@ object Dependencies {
     "io.udash" %%% "udash-charts" % udashVersion,
     // type-safe wrapper for jQuery
     "io.udash" %%% "udash-jquery" % udashJQueryVersion,
+
+    // Trying scalajs-d3
+    "org.singlespaced" %%% "scalajs-d3" % "0.3.4"
   ))
 
   // JavaScript libraries dependencies

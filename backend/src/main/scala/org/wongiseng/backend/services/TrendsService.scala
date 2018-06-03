@@ -8,71 +8,112 @@ import com.danielasfregola.twitter4s.entities.{Tweet, User}
 import io.udash.logging.CrossLogging
 import io.udash.rpc.ClientId
 import org.joda.time.DateTime
-import org.wongiseng.shared.model.userstat.{CategoryCount, CategoryStats, UserActivity, UserStats}
+import org.wongiseng.shared.model.userstat.{
+  CategoryCount,
+  CategoryStats,
+  UserActivity,
+  UserStats
+}
+import org.wongiseng.shared.rest.{Graph, Link, Node}
 
 import scala.collection.mutable
 
 class TrendsService(rpcClientsService: RpcClientsService)
-    extends UserCategories  with CrossLogging {
+    extends UserTrends
+    with CrossLogging {
+
+  import singletonData._
 
   val streamingClient = TwitterStreamingClient()
 
-  def subscribeHashtag(hashtag: String)(implicit clientId: ClientId): Future[Unit] = {
-    logger.info("Subscribing hashtag: "+ hashtag)
+  def subscribeHashtag(hashtag: String)(
+      implicit clientId: ClientId): Future[Unit] = {
+    logger.info("Subscribing hashtag: " + hashtag + " for client " + clientId)
     observeHashtag(hashtag, clientId)
     Future.unit
   }
 
-  var hashTags = Set[String]()
-  var tweetCount = 0
-  val idUsers = mutable.HashMap[Long, User]()
-  val userCount = mutable.HashMap[Long, Int]()
+  def follower_group(user : User) =
+    if(user.followers_count < 50) 0
+    else if(user.followers_count < 100) 1
+    else if(user.followers_count < 200) 2
+    else if(user.followers_count < 400) 3
+    else if(user.followers_count < 800) 4
+    else if(user.followers_count < 1600) 5
+    else if(user.followers_count < 3200) 6
+    else 7
 
   private def observeHashtag(hashtag: String, clientId: ClientId) = {
     hashTags = hashTags + hashtag
 
-    logger.info("Current hashtag set: "+ hashTags.mkString(", "))
+    logger.info("Current hashtag set: " + hashTags.mkString(", "))
 
     val seqHashtag = hashTags.toList
 
     streamingClient.filterStatuses(tracks = seqHashtag) {
       case tweet: Tweet => {
+
         tweetCount += 1
+
         tweet.user.map(user => {
           val curCount = userCount.getOrElseUpdate(user.id, 0)
+          if (curCount == 0) {
+            logger.info("Adding to graph" + user.screen_name)
+            nodes += Node(user.screen_name, user.name, follower_group(user))
+          }
           userCount.put(user.id, curCount + 1)
           idUsers.put(user.id, user)
         })
 
-        if (tweetCount % 10 == 0) updateClients()
+        tweet.retweeted_status.map { originalTweet =>
+          val retweetCount = originalTweet.retweet_count.toInt
+          for {
+            origUser <- originalTweet.user
+            curUser <- tweet.user
+          } yield {
+            if (!idUsers.contains(origUser.id)) {
+              logger.info("Adding orig to graph " + origUser.screen_name)
+              nodes += Node(origUser.screen_name, origUser.screen_name, follower_group(origUser))
+            }
+            logger.info(
+              "Updating retweet  graph " + curUser.screen_name + " -> " + origUser.screen_name)
+            links += Link(curUser.screen_name,
+                          origUser.screen_name,
+                          retweetCount)
+          }
+        }
+
+        logger.info("Updating client : " + clientId)
+        if (tweetCount % 10 == 0) {
+          if (rpcClientsService.activeClients.size > 0)
+            rpcClientsService
+              .sendToClient(clientId)
+              .trends()
+              .newUserStats(currentStats())
+        }
       }
     }
 
-    def updateClients(): Unit = {
-      logger.info("Updating client : "+clientId)
-      val ages = accountAges(idUsers.values.toSet)
-      val followers = followerCounts(idUsers.values.toSet)
-      val activities = userCount.toList.sortBy(-_._2).take(20).map {
-        case (userId, count) => UserActivity(idUsers(userId).screen_name, count)
-      }
-
-      val userStats = UserStats(
-        hashTags.mkString(" "),
-        tweetCount,
-        List(ages, followers),
-        activities
-      )
-
-      if (rpcClientsService.activeClients.size > 0)
-        rpcClientsService
-          .sendToClient(clientId)
-          .trends()
-          .newUserStats(userStats)
-    }
   }
 }
 
-trait UserCategories {
+trait UserTrends extends InMemoryStats {
+  import singletonData._
+
+  def currentStats() = {
+
+    val ages = accountAges(idUsers.values.toSet)
+    val followers = followerCounts(idUsers.values.toSet)
+    val activities = userCount.toList.sortBy(-_._2).take(20).map {
+      case (userId, count) => UserActivity(idUsers(userId).screen_name, count)
+    }
+    UserStats(
+      hashTags.mkString(" "),
+      tweetCount,
+      List(ages, followers),
+      activities
+    )
+  }
 
   def followers_limit(low: Int = Int.MinValue, high: Int = Int.MaxValue)(
       u: User) = u.followers_count < high && u.followers_count >= low
@@ -127,4 +168,22 @@ trait UserCategories {
                        cntAge2yto4y,
                        cntOlder4y))
   }
+}
+
+trait InMemoryStats extends CrossLogging {
+  import singletonData._
+
+  def retweetGraph() = {
+    logger.info("Returning retweet with " + nodes.toString + " " + links)
+    Graph(nodes.toList, links.toList)
+  }
+}
+
+object singletonData {
+  var hashTags = Set[String]()
+  var tweetCount = 0
+  val idUsers = mutable.HashMap[Long, User]()
+  val userCount = mutable.HashMap[Long, Int]()
+  val nodes = mutable.Set[Node]()
+  val links = mutable.Set[Link]()
 }

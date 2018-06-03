@@ -23,7 +23,11 @@ Then you can run:
     sbt run
     
     
-http://localhost:9000/#/trends/[hashtag] to see current state of curious trend.
+http://localhost:9000/#/trends/[hashtag] to see current state of curious trend, should be pushing live update from backend. Everytime you open this endpoint with additional hashtag it will accumulate, and the more you did this you might hit twitter Rate limit for your API. Either that or memory limit at some point, current implementation has no backend/persistence support.
+
+http://localhost:9000/assets/2d/  to see 2d visualization using d3 js. Improper integration with d3 js assuming you run this without modification on port 9000 on localhost. Still don't know how to properly use udash for this.
+
+http://localhost:9000/assets/3d/  the 3d visualization. For both of these visualization, no live update/push from backend, it's pull based you need to refresh to get the latest data.
 
 
 This is an example of normal generic trending topics user characteristics looks like (ramos after dirty wins of Real madrid):
@@ -32,3 +36,7 @@ This is an example of normal generic trending topics user characteristics looks 
 Unfortunately I have not yet found another curious trends to be analysed using this newly build, work in progress, udash based analyser, what I currently have is just previous result of original gist that shows skewed user attributes that promote a certain tag, related to Indonesian politics (#HTILanjutkanPerjuangan):
 
 ![image](https://i.imgur.com/L4INuTr.gif)
+
+Meanwhile, visualization of retweet graph using d3.js 3d force graph:
+
+![image](https://i.imgur.com/QSBRKwB.jpg)
