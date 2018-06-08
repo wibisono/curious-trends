@@ -8,6 +8,14 @@ Graph
   .nodeAutoColorBy('group')
   .numDimensions(2)
   .linkWidth(2)
+  .nodeThreeObject(
+      node => {
+          const sprite = new SpriteText(node.id);
+          sprite.color = node.color;
+          sprite.textHeight = 8;
+          return sprite;
+      }
+  )
   .nodeColor(n => {
         return d3.interpolatePlasma(n.group/8.0);
     })
@@ -15,3 +23,4 @@ Graph
   .forceEngine('ngraph')
   .jsonUrl('http://localhost:9000/rest/simple/graph');
 
+Graph.d3Force('charge').strength(-150);
